@@ -54,8 +54,8 @@ public class CouchbaseClientWithVersioning extends CouchbaseClient {
             Object obj = this.get(key);
             if (obj != null) {
                 // get the next version
-                long version = this.incr(key.concat(VERSION_COUNTER_SUFFIX), 1, 1);
-                String keyForVersion = key.concat(VERSION_NUMBER_PREFIX).concat(Long.toString(version));
+                long version = this.incr(key + VERSION_COUNTER_SUFFIX, 1, 1);
+                String keyForVersion = key + VERSION_NUMBER_PREFIX + version;
 				try {
 					this.set(keyForVersion, obj).get();
 				} catch (Exception e) {
@@ -76,8 +76,8 @@ public class CouchbaseClientWithVersioning extends CouchbaseClient {
         Object obj = this.get(key);
         if (obj != null) {
             // get the next version
-            long version = this.incr(key.concat(VERSION_COUNTER_SUFFIX), 1, 1);
-            String keyForVersion = key.concat(VERSION_NUMBER_PREFIX).concat(Long.toString(version));
+            long version = this.incr(key + VERSION_COUNTER_SUFFIX , 1, 1);
+            String keyForVersion = key + VERSION_NUMBER_PREFIX + version;
             this.add(keyForVersion, obj).get();
             return super.set(key, value);
         } else {
@@ -96,7 +96,7 @@ public class CouchbaseClientWithVersioning extends CouchbaseClient {
      * @return  the value for the specific version
      */
     public Object get(String key, int version) {
-        return super.get(key.concat(VERSION_NUMBER_PREFIX).concat(Integer.toString(version)));
+        return super.get(key + VERSION_NUMBER_PREFIX + version);
     }
 
 
@@ -134,7 +134,7 @@ public class CouchbaseClientWithVersioning extends CouchbaseClient {
 	 * @return whether or not the operation was performed
 	 */
     public  OperationFuture<java.lang.Boolean> deleteVersion(String key, int version) {
-        return super.delete(key.concat(VERSION_NUMBER_PREFIX).concat(Integer.toString(version)));
+        return super.delete(key + VERSION_NUMBER_PREFIX + version);
     }
 
 
@@ -146,7 +146,7 @@ public class CouchbaseClientWithVersioning extends CouchbaseClient {
 	public OperationFuture<Boolean> delete(String key) {
 
         // need to delete all the version first
-        Object vObject = this.get(key.concat(VERSION_COUNTER_SUFFIX));
+        Object vObject = this.get(key + VERSION_COUNTER_SUFFIX);
         if (vObject != null) {
 
             long biggerVersion = Long.parseLong((String) vObject);
@@ -158,7 +158,7 @@ public class CouchbaseClientWithVersioning extends CouchbaseClient {
                 }
 
                 // delete the counter
-                super.delete(key.concat(VERSION_COUNTER_SUFFIX)).get();
+                super.delete(key + VERSION_COUNTER_SUFFIX).get();
 
             } catch (InterruptedException e) {
                 e.printStackTrace();
